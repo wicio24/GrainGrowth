@@ -483,21 +483,18 @@ public class Game {
             for (int j = 0; j < tabSizeWidth; j++) {
                 temp_energy = getEnergy(i, j, tab1[i][j].getId());
 
-                while (true) {
 
-                    if (temp_energy > 0) {
-
-                        tab2[i][j].setId(generator.nextInt(grainAmount)+1);
+                if (temp_energy > 0) {
+                    while (true) {
+                        tab2[i][j].setId(generator.nextInt(grainAmount) + 1);
 
                         tab2[i][j].setColor(Cell.getById(tab2[i][j].getId()));
-
 
 
                         new_energy = getEnergy(i, j, tab2[i][j].getId());
 
 
-                        if( new_energy <= temp_energy)
-                        {
+                        if (new_energy <= temp_energy) {
                             tab1[i][j].setId(tab2[i][j].getId());
                             tab1[i][j].setColor(tab2[i][j].getColor());
                             break;
@@ -505,8 +502,7 @@ public class Game {
                     }
 
 
-
-                }//while
+                }
             }//for
         }//for
 
@@ -696,7 +692,7 @@ public class Game {
                 tab2[i][j].setColor(Color.WHITE);
             }
         }
-Cell.getMyMap().clear();
+        Cell.getMyMap().clear();
     }
 
     public void setTab1Cell(int x, int y, int state) {
