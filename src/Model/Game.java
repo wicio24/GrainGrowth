@@ -2,6 +2,7 @@ package Model;
 
 
 import javafx.scene.paint.Color;
+
 import java.util.Random;
 
 public class Game {
@@ -403,6 +404,114 @@ public class Game {
         writeTables();
     }
 
+    public int getEnergy(int i, int j, int temp_id) {
+        int iP, iM, jP, jM;
+        int energy = 0;
+
+
+        if (periodic) {
+            if (i == 0) iM = tabSizeHeight - 1;
+            else iM = i - 1;
+
+            if (j == 0) jM = tabSizeWidth - 1;
+            else jM = j - 1;
+
+            if (i == tabSizeHeight - 1) iP = 0;
+            else iP = i + 1;
+
+
+            if (j == tabSizeWidth - 1) jP = 0;
+            else jP = j + 1;
+        } else {
+            if (i == 0) iM = 0;
+            else iM = i - 1;
+
+            if (j == 0) jM = 0;
+            else jM = j - 1;
+
+            if (i == tabSizeHeight - 1) iP = tabSizeHeight - 1;
+            else iP = i + 1;
+
+
+            if (j == tabSizeWidth - 1) jP = tabSizeWidth - 1;
+            else jP = j + 1;
+        }
+
+
+        if (tab1[i][j].getState() == 1) {
+
+            if (tab1[iM][jM].getId() != temp_id) {
+                energy++;
+
+            }
+            if (tab1[iM][j].getState() != temp_id) {
+                energy++;
+            }
+            if (tab1[iM][jP].getState() != temp_id) {
+                energy++;
+            }
+
+
+            if (tab1[i][jM].getState() != temp_id) {
+                energy++;
+            }
+            if (tab1[i][jP].getState() != temp_id) {
+                energy++;
+            }
+
+
+            if (tab1[iP][jM].getState() != temp_id) {
+                energy++;
+            }
+            if (tab1[iP][j].getState() != temp_id) {
+                energy++;
+            }
+            if (tab1[iP][jP].getState() != temp_id) {
+                energy++;
+            }
+
+
+        }
+        return energy;
+    }
+
+
+    public void monteCarlo(int grainAmount) {
+        Random generator = new Random();
+        int temp_energy, new_energy;
+        for (int i = 0; i < tabSizeHeight; i++) {
+            for (int j = 0; j < tabSizeWidth; j++) {
+                temp_energy = getEnergy(i, j, tab1[i][j].getId());
+
+                while (true) {
+
+                    if (temp_energy > 0) {
+
+                        tab2[i][j].setId(generator.nextInt(grainAmount)+1);
+
+                        tab2[i][j].setColor(Cell.getById(tab2[i][j].getId()));
+
+
+
+                        new_energy = getEnergy(i, j, tab2[i][j].getId());
+
+
+                        if( new_energy <= temp_energy)
+                        {
+                            tab1[i][j].setId(tab2[i][j].getId());
+                            tab1[i][j].setColor(tab2[i][j].getColor());
+                            break;
+                        }
+                    }
+
+
+
+                }//while
+            }//for
+        }//for
+
+    }
+
 
     public void fillRandomly(int startingPoints) {
         Random generator = new Random();
@@ -412,6 +521,8 @@ public class Game {
             int y = generator.nextInt(tabSizeHeight);
             tab1[y][x].setColor(Color.rgb(generator.nextInt(255), generator.nextInt(255), generator.nextInt(255)));
             tab1[y][x].setState(1);
+            tab1[y][x].setId(startingPoints--);
+            Cell.putMyMap(tab1[y][x].getId(), tab1[y][x].getColor());
 
         }
 
@@ -432,7 +543,8 @@ public class Game {
             if (i == maxGrainNumber) break;
             tab1[x][y].setState(1);
             tab1[x][y].setColor(Color.rgb(generator.nextInt(255), generator.nextInt(255), generator.nextInt(255)));
-
+            tab1[y][x].setId(startingPoints--);
+            Cell.putMyMap(tab1[y][x].getId(), tab1[y][x].getColor());
             x += distance + 1;
             counter++;
 
@@ -453,6 +565,7 @@ public class Game {
             this.x = x;
             this.y = y;
         }
+
     }
 
     private Coordinates getUp(int x, int y, int range) {
@@ -528,7 +641,7 @@ public class Game {
         }
     }
 
-    public void fillRandomlyWithRadius(int grainAmount, int radius) {
+    public void fillRandomlyWithRadius(int startingPoints, int radius) {
 
         Random generator = new Random();
 
@@ -541,7 +654,7 @@ public class Game {
                 if (tab1[i][j].getState() == 0) amount++;
 
 
-        for (int i = 0; i < grainAmount; i++) {
+        for (int i = 0; i < startingPoints; i++) {
             if (amount == 0)
                 break;
 
@@ -551,6 +664,9 @@ public class Game {
             if (tab2[y][x].getState() == 0) {
                 tab1[y][x].setColor(Color.rgb(generator.nextInt(255), generator.nextInt(255), generator.nextInt(255)));
                 tab1[y][x].setState(1);
+                tab1[y][x].setId(startingPoints--);
+                tab2[y][x].setId(startingPoints--);
+                Cell.putMyMap(tab1[y][x].getId(), tab1[y][x].getColor());
                 tab2[y][x].setState(1);
                 setRadius(y, x, radius);
             } else {
@@ -580,7 +696,7 @@ public class Game {
                 tab2[i][j].setColor(Color.WHITE);
             }
         }
-
+Cell.getMyMap().clear();
     }
 
     public void setTab1Cell(int x, int y, int state) {
@@ -602,4 +718,6 @@ public class Game {
     public void setPeriodic(boolean periodic) {
         this.periodic = periodic;
     }
+
+
 }

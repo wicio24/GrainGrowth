@@ -17,7 +17,7 @@ import java.util.Random;
 public class Controller {
     private GraphicsContext gc;
 
-    private int pixelSize = 2;
+    private int pixelSize = 4;
     private int speed = 100;
     private int tabSizeHeight;
     private int tabSizeWidth;
@@ -58,6 +58,9 @@ public class Controller {
 
     @FXML
     private TextField textFieldDistance;
+
+    @FXML
+    private Button monteCarloButton;
 
 
     @FXML
@@ -158,6 +161,15 @@ public class Controller {
     private void handleNextStep() {
         drawCanvas();
     }
+
+
+    @FXML
+    private void handleMonteCarlo()
+    {
+        game.monteCarlo(startingPoints);
+        printCanvas();
+    }
+
 
     public void randomNewPoints() {
 
